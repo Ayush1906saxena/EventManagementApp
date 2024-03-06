@@ -1,0 +1,4 @@
+/ : starting page with featured events
+/events: list all events
+/events/[some_id]: Details of a specific events
+/events/...slug: Filtered events page with 
