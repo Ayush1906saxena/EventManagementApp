@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { getEventById, getAllEvents } from "../../helpers/api-util";
+import { getEventById, getFeaturedEvents } from "../../helpers/api-util";
 import { Fragment } from "react";
 
 import EventSummary from "../../components/event-detail/event-summary";
@@ -7,13 +7,14 @@ import EventLogistics from "../../components/event-detail/event-logistics";
 import EventContent from "../../components/event-detail/event-content";
 import ErrorAlert from "../../components/ui/error-alert";
 
-export default function EventDetailPage(props) {
+function EventDetailPage(props) {
   const event = props.selectedEvent;
+
   if (!event) {
     return (
-      <ErrorAlert>
-        <p>No Event found!</p>
-      </ErrorAlert>
+      <div className="center">
+        <p>Loading...</p>
+      </div>
     );
   }
 
@@ -35,7 +36,6 @@ export default function EventDetailPage(props) {
 
 export async function getStaticProps(context) {
   const eventId = context.params.eventId;
-
   const event = await getEventById(eventId);
 
   return {
@@ -47,12 +47,16 @@ export async function getStaticProps(context) {
 }
 
 export async function getStaticPaths() {
-  const events = await getAllEvents();
+  // getting all events could lead to performance issues, so we will be fetching just the featured events
+  const events = await getFeaturedEvents();
 
   const paths = events.map((event) => ({ params: { eventId: event.id } }));
 
   return {
     paths: paths,
-    fallback: false,
+    // telling nextjs that there might be more events
+    fallback: "blocking",
   };
 }
+
+export default EventDetailPage;
